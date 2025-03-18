@@ -3,7 +3,7 @@
 export default async function Home() {
   return (
     <>
-      <h1>HOME PAGE</h1>
+      <h1 className="font-geist">HOME PAGE</h1>
     </>
   );
 }

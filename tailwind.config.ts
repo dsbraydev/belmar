@@ -18,6 +18,10 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        geist: ['var(--font-geist)', 'sans-serif'],
+        montserrat: ['var(--font-montserrat)', 'serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -52,6 +56,8 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        slateBlue: "#3D405B", 
+        sageGreen: "#81B29A"
       },
       borderRadius: {
         lg: "var(--radius)",

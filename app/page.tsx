@@ -1,9 +1,31 @@
-// import { hasEnvVars } from "@/utils/supabase/check-env-vars";
+import { signInAction } from "@/app/api/actions";
+import { FormMessage, Message } from "@/components/form-message";
+import { SubmitButton } from "@/components/submit-button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-export default async function Home() {
+export default async function Home(props: { searchParams: Promise<Message> }) {
+  const searchParams = await props.searchParams;
   return (
-    <>
-      <h1 className="font-geist">HOME PAGE</h1>
-    </>
+    <form className="flex-1 flex flex-col min-w-64 mt-20">
+      <h1 className="text-2xl font-medium">Sign in</h1>
+      <div className="flex flex-col gap-2 [&>input]:mb-3 mt-8">
+        <Label htmlFor="email">Email</Label>
+        <Input name="email" placeholder="you@example.com" required />
+        <div className="flex justify-between items-center">
+          <Label htmlFor="password">Password</Label>
+        </div>
+        <Input
+          type="password"
+          name="password"
+          placeholder="Your password"
+          required
+        />
+        <SubmitButton pendingText="Signing In..." formAction={signInAction}>
+          Sign in
+        </SubmitButton>
+        <FormMessage message={searchParams} />
+      </div>
+    </form>
   );
 }

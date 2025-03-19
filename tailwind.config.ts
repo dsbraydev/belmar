@@ -57,7 +57,8 @@ const config = {
           foreground: "hsl(var(--card-foreground))",
         },
         slateBlue: "#3D405B", 
-        sageGreen: "#81B29A"
+        sageGreen: "#81B29A",
+        blackOpacity: 'rgb(0 0 0 / 35%)',
       },
       borderRadius: {
         lg: "var(--radius)",

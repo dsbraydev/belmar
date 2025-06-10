@@ -1,39 +1,121 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import supabase from "../client";
 
-// 🟢 GET: Fetch job_specs with related applicants
-export const fetchJobSpecsWithApplicants = async () => {
-  const { data, error } = await supabase
-    .from("job_specs")
-    .select("*, applicants(*)"); // Fetch job_specs with related applicants
+const APPLICANTS_TABLE = "applicants";
 
-  if (error) throw error;
-  return data;
-};
-
-// ✅ Hook to get job_specs with applicants
-export const useJobSpecsWithApplicants = () => {
+// Fetch all applicants
+export const useApplicants = () => {
   return useQuery({
-    queryKey: ["job_specs_with_applicants"],
-    queryFn: fetchJobSpecsWithApplicants,
+    queryKey: ["applicants"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from(APPLICANTS_TABLE)
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
   });
 };
 
-export const fetchJobSpecById = async (id: string | number) => {
-  const { data, error } = await supabase
-    .from("job_specs")
-    .select("*, applicants(*)") // Fetch job with related applicants
-    .eq("id", id) // Filter by the given id
-    .single(); // Ensure a single object is returned
+// Create a new applicant
+export const useCreateApplicant = () => {
+  const queryClient = useQueryClient();
 
-  if (error) throw error;
-  return data;
+  return useMutation({
+    mutationFn: async (newApplicant: {
+      name: string;
+      surname: string;
+      job_title?: string;
+      location?: string;
+      id_number?: number;
+      photo?: string;
+      cv?: string;
+      category?: string;
+      drivers_license?: boolean;
+      transport?: boolean;
+      notes?: string;
+      salary?: number;
+      experience_level?: number;
+      job_spec_id?: string;
+      status?: string;
+    }) => {
+      const { data, error } = await supabase
+        .from(APPLICANTS_TABLE)
+        .insert([newApplicant])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["applicants"] });
+    },
+  });
 };
 
-export const useJobSpecById = (id: string | number) => {
-  return useQuery({
-    queryKey: ["job_spec", id],
-    queryFn: () => fetchJobSpecById(id),
-    enabled: !!id, // Ensure the query only runs if ID is available
+// Update an applicant
+export const useUpdateApplicant = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: {
+        name?: string;
+        surname?: string;
+        job_title?: string;
+        location?: string;
+        id_number?: number;
+        photo?: string;
+        cv?: string;
+        category?: string;
+        drivers_license?: boolean;
+        transport?: boolean;
+        notes?: string;
+        salary?: number;
+        experience_level?: number;
+        job_spec_id?: string;
+        status?: string;
+      };
+    }) => {
+      const { data, error } = await supabase
+        .from(APPLICANTS_TABLE)
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["applicants"] });
+    },
+  });
+};
+
+// Delete an applicant
+export const useDeleteApplicant = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from(APPLICANTS_TABLE)
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["applicants"] });
+    },
   });
 };
